@@ -10,13 +10,13 @@ function [frames, pos, target_sz, resize_image, ground_truth, ...
 %   The path to the video is returned, since it may change if the images
 %   are located in a sub-folder (as is the default for MILTrack's videos).
 %
-%   João F. Henriques, 2012
-%   http://www.isr.uc.pt/~henriques/
+%   João F. zhangzheng, 2017
+%   https://www.github.com/zhangzheng1993/Tracker_Benchmark_tb100.git
 
 	%load ground truth from text file (MILTrack's format)
-	text_files = dir([video_path 'groundtruth_rect' clip '.txt']);
+	text_files = dir([video_path 'groundtruth_rect' clip '.txt']); %  by zz (2017/3/23) fix for special kinds of groundtruth .txt files
     if(isempty(text_files))
-        text_files = dir([video_path 'groundtruth_rect.txt']);
+        text_files = dir([video_path 'groundtruth_rect.txt']);      
     end
 % text_files = dir([video_path  '_gt.txt']);
 	assert(~isempty(text_files), 'No initial position and ground truth (*_gt.txt) to load.')
@@ -26,7 +26,7 @@ function [frames, pos, target_sz, resize_image, ground_truth, ...
 	azz=0;
     for izz=1:length(ground_truth)
         if(size(ground_truth{1,izz},1)<2)
-            ground_truth = dlmread([video_path text_files(1).name]);  %[x, y, width, height]
+            ground_truth = dlmread([video_path text_files(1).name]);  % by zz (2017/3/23)read files for type of [x      y      width      height]
             %ground_truth = cat(2, ground_truth{:});
             azz=1;
             break;
@@ -38,7 +38,7 @@ function [frames, pos, target_sz, resize_image, ground_truth, ...
 	fclose(f);
 	
 	%set initial position and size
-	target_sz = [ground_truth(seq.startFrame,4), ground_truth(seq.startFrame,3)];
+	target_sz = [ground_truth(seq.startFrame,4), ground_truth(seq.startFrame,3)];    %by zz (2017/3/23) fixed for there are occ for first few frame pictures of some seqs.
 	pos = [ground_truth(seq.startFrame,2), ground_truth(seq.startFrame,1)] + floor(target_sz/2);
 	
 	%interpolate missing annotations, and store positions instead of boxes

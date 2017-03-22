@@ -20,8 +20,8 @@ function  results  = run_CFWLB( seq, res_path, bSaveImage )
 
 %   the main code for training CFwLB is in folder "CFwLB"
 
-%   Author: Hamed Kiani
-%   Date:   May 2014.
+%   Author: zhangzheng
+%   Date:   Mat. 2017.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -80,9 +80,9 @@ video_path=seq.path;
 
 %video_path = ['faceocc_frames/'];
 [img_files, pos, target_sz, resize_image, ground_truth, ...
-    video_path, resize_scale] = load_video_info(video_path, clips,seq);
-seq = evalin('base', 'subS');
-%target_sz = seq.init_rect(1,[4,3]);
+    video_path, resize_scale] = load_video_info(video_path, clips,seq);  % by zz (2017/3/23)interface key point 
+seq = evalin('base', 'subS');                                           % what I have learned is that do not change the demo code as much as possible
+%target_sz = seq.init_rect(1,[4,3]);                                    %usually is work already
 %pos = seq.init_rect(1,[2,1]) + floor(target_sz/2);
 %img_files = seq.s_frames;
 %video_path = [];
@@ -282,7 +282,7 @@ avgError = sum(posDis)/frame
 fps = frame/sum(runTime)
 
 %by zz 2017/3/22
-rects = [positions(:,2) - target_sz(:,2)/2, positions(:,1) - target_sz(:,1)/2];
+rects = [positions(:,2) - target_sz(:,2)/2, positions(:,1) - target_sz(:,1)/2];% return the res for benchmark v1.1
 		rects(:,3) = target_sz(:,2);
 		rects(:,4) = target_sz(:,1);
 		results.type = 'rect';
