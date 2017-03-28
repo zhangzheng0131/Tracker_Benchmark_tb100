@@ -1,0 +1,1 @@
+0.662 MDnet (in paper ECO:0.682)
