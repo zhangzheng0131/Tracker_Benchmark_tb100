@@ -16,8 +16,9 @@ switch evalType
 end
 
 for idxSeq=1:length(seqs)
+    %idxSeq=91;
     s = seqs{idxSeq};
-    
+    seqzz{idxSeq}=s.name;
     s.len = s.endFrame - s.startFrame + 1;
     s.s_frames = cell(s.len,1);
     nz	= strcat('%0',num2str(s.nz),'d'); %number of zeros in the name of image
@@ -36,8 +37,14 @@ for idxSeq=1:length(seqs)
         
         t = trackers{idxTrk};
         %         load([rpAll s.name '_' t.name '.mat'], 'results','coverage','errCenter');
-        
-        load([rpAll s.name '_' t.name '.mat'])
+        if idxTrk~=13
+            load([rpAll s.name '_' t.name '.mat'])
+        else
+            %res.type = res.transformType;
+            res.res =  load([rpAll s.name '_' t.name '.mat']);
+            res.res = res.res.result;
+        end
+        trkzz{idxTrk}=t.name;
         disp([s.name ' ' t.name]);
         
         aveCoverageAll=[];
@@ -64,7 +71,16 @@ for idxSeq=1:length(seqs)
         successNumErr = zeros(idxNum,length(thresholdSetError));
         
         for idx = 1:idxNum
-            res = results{idx};
+            if idxTrk~=13
+                res = results{idx};
+            else
+                res.res = res.res;
+                res.type = results{idx}.type;
+                res.fps = results{idx}.fps;
+                res.len = results{idx}.len;
+                res.annoBegin = results{idx}.annoBegin;
+                res.startFrame = results{idx}.startFrame;
+            end
             
             if strcmp(evalType, 'TRE')
                 anno=subAnno{idx};
@@ -84,7 +100,7 @@ for idxSeq=1:length(seqs)
             end
             
             [aveCoverage, aveErrCenter, errCoverage, errCenter] = calcSeqErrRobust(res, anno);
-            
+            resultszz(idxSeq,idxTrk)=aveCoverage;
             for tIdx=1:length(thresholdSetOverlap)
                 successNumOverlap(idx,tIdx) = sum(errCoverage >thresholdSetOverlap(tIdx));
             end
@@ -109,6 +125,16 @@ for idxSeq=1:length(seqs)
     end
 end
 %
+%写入到excel数据
+[status, message] = xlswrite('F:\Workplace\matlab\tracker_benchmark_v1.1\tracker_benchmark_v1.1\results\result.xlsx', resultszz, 'Sheet1', 'B2:P101');
+%行名称与列名称
+%textdate=textdate(2,2:5)
+[status, message] = xlswrite('F:\Workplace\matlab\tracker_benchmark_v1.1\tracker_benchmark_v1.1\results\result.xlsx', trkzz, 'Sheet1', 'B1:P1');
+
+for i=1:length(seqzz)
+    locationzz=['A' num2str(i+1)]; 
+    [status, message] = xlswrite('F:\Workplace\matlab\tracker_benchmark_v1.1\tracker_benchmark_v1.1\results\result.xlsx', seqzz(i), 'Sheet1', locationzz);
+end
 dataName1=[perfMatPath 'aveSuccessRatePlot_' num2str(numTrk) 'alg_overlap_' evalType '.mat'];
 save(dataName1,'aveSuccessRatePlot','nameTrkAll');
 
